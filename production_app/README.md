@@ -1,46 +1,210 @@
-# Facial Expression Recognition System (DCNN-BiLSTM-DAM)
+# AI Emotion Recognition System
 
-This is a state-of-the-art implementation of the **DCNN-BiLSTM-DAM** architecture for Facial Expression Recognition (FER), as specified in the project requirements.
+A deep learning based **Facial Expression Recognition System** built using a hybrid neural architecture combining **DCNN, BiLSTM, and Dual Attention Mechanism**. The system analyzes facial features in real time and predicts human emotions using a trained deep learning model.
 
-## 📁 Project Structure
-- `main.py`: The core FastAPI backend server and real-time inference engine.
-- `core_model.py`: The DCNN-BiLSTM-DAM Neural Network architecture (PyTorch).
-- `train.py`: The automated training script that fetches the FER-2013 dataset and fine-tunes the model.
-- `/static`: Premium web-based dashboard and presentation assets.
-- `/models`: Contains the trained weights (`.pth`) and exported (`.onnx`) versions.
-- `/docs`: Project paperwork, base paper, and requirement forms.
-- `/tools`: Auxiliary scripts for testing and exporting models.
+This project also includes a **web-based interactive presentation dashboard** explaining the architecture and workflow of the system.
 
-## 🚀 Getting Started
+---
 
-### 1. Training the Model
-The system is pre-configured to automatically download and train on the **FER-2013** dataset (35,000+ images) via KaggleHub.
-```bash
-python3 train.py
-```
-*The model will automatically save the best weights to `models/best_model_dcnn_dam.pth`.*
+## Project Overview
 
-### 2. Running the Live Dashboard
-Access the application at: **http://127.0.0.1:8005**
+Facial Expression Recognition (FER) is a key component of modern **Human-Computer Interaction (HCI)** systems. This project implements a custom deep learning pipeline capable of identifying human emotions from facial images.
 
-#### 🐧 macOS / Linux
-Starts the production server:
-```bash
-python3 -m uvicorn main:app --port 8005 --reload
-```
+The model integrates multiple deep learning techniques to improve recognition performance under varying conditions such as lighting changes and facial orientation.
 
-#### 💻 Windows (One-Click)
-Simply double-click the `run_windows.bat` file. 
-- It will automatically create a virtual environment (`venv`).
-- Installs all dependencies from `requirements.txt`.
-- Launches the server and dashboard immediately.
+---
 
-### 3. Viewing the Presentation
-Open the interactive landing page at: **http://127.0.0.1:8005**
+## Key Features
+
+- Real-time facial expression detection
+- Deep learning architecture using **DCNN + BiLSTM + Dual Attention**
+- YOLOv8 based face detection
+- Interactive web presentation dashboard
+- Visualization of system architecture
+- Modular pipeline for preprocessing and inference
+- Docker-ready for cloud deployment
+
+---
+
+## System Architecture
+
+The pipeline follows this flow:
 
 
-## 💡 Tech Stack
-- **Backend:** FastAPI, PyTorch (DCNN-BiLSTM-DAM Architecture).
-- **Computer Vision:** YOLOv8 (Tracking), HOG (Feature Extraction), OpenCV.
-- **Frontend:** Vanilla HTML5, CSS3 (Glassmorphism), JavaScript (Particle Engine).
-- **Environment:** Compatible with macOS (MPS) and Windows (CUDA) acceleration.
+Input Image / Video
+↓
+Face Detection (YOLOv8)
+↓
+Preprocessing (HOG Feature Extraction)
+↓
+Deep Convolutional Neural Network
+↓
+Dual Attention Mechanism
+↓
+Bidirectional LSTM
+↓
+Softmax Classifier
+↓
+Emotion Prediction
+
+
+---
+
+## Technology Stack
+
+### Machine Learning
+- Python
+- PyTorch
+- OpenCV
+- NumPy
+- Scikit-image
+
+### Deep Learning Models
+- DCNN (Deep Convolutional Neural Network)
+- BiLSTM (Bidirectional Long Short-Term Memory)
+- Dual Attention Mechanism
+- YOLOv8 for face detection
+
+### Web Framework
+- FastAPI
+- HTML / CSS / JavaScript
+
+### Deployment (Planned)
+- Docker
+- AWS ECS Fargate
+- AWS ECR
+- Application Load Balancer
+- CloudFront
+- CloudWatch
+
+---
+
+## Project Structure
+
+
+AIIO_Expression_Analyzer_Project
+│
+├── production_app
+│ ├── main.py
+│ ├── core_model.py
+│ ├── requirements.txt
+│ ├── models
+│ │ ├── best_model_dcnn_dam.pth
+│ │ └── dcnn_dam_opt.onnx
+│ ├── static
+│ │ ├── index.html
+│ │ ├── architecture.html
+│ │ └── dashboard.html
+│
+├── Dockerfile
+└── README.md
+
+
+---
+
+## Installation
+
+Clone the repository:
+
+
+git clone https://github.com/YOUR_USERNAME/REPO_NAME.git
+
+cd REPO_NAME
+
+
+Create a virtual environment:
+
+
+python -m venv venv
+
+
+Activate environment:
+
+Windows:
+
+
+venv\Scripts\activate
+
+
+Install dependencies:
+
+
+pip install -r requirements.txt
+
+
+---
+
+## Running the Application
+
+Start the FastAPI server:
+
+
+uvicorn main:app --reload
+
+
+Open browser:
+
+
+http://127.0.0.1:8000
+
+
+---
+
+## Docker Setup
+
+Build Docker image:
+
+
+docker build -t emotion-ai .
+
+
+Run container:
+
+
+docker run -p 8000:8000 emotion-ai
+
+
+---
+
+## Model Information
+
+Dataset used for training:
+
+**FER-2013**
+
+Total images: **35,887**
+
+Emotion classes:
+
+- Angry
+- Disgust
+- Fear
+- Happy
+- Sad
+- Surprise
+- Neutral
+
+---
+
+## Future Improvements
+
+- Deploy model inference using AWS ECS Fargate
+- Add scalable architecture using AWS ALB
+- Integrate CloudFront CDN
+- Improve model accuracy with larger datasets
+- Implement real-time video streaming inference
+
+---
+
+## Author
+
+**Sudharsan B**
+
+Computer Science Engineering  
+Cloud Computing & AI Enthusiast
+
+---
+
+## License
+
+This project is for educational and research purposes.
