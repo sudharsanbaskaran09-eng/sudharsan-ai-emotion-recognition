@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Project Review - Deep Learning</title>
+    <!-- Premium Web Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #020617;
+            --surface: rgba(15, 23, 42, 0.6);
+            --surface-hover: rgba(30, 41, 59, 0.8);
+            --primary: #10b981;
+            --secondary: #0ea5e9;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --glow: rgba(16, 185, 129, 0.5);
+            --glow-alt: rgba(14, 165, 233, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Animated Canvas Background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Ambient Glow Blobs */
+        .ambient {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(150px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: pulse-glow 10s infinite alternate;
+        }
+
+        .ambient-1 {
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: var(--primary);
+        }
+
+        .ambient-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: var(--secondary);
+            animation-delay: -5s;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: scale(1.2);
+                opacity: 0.5;
+            }
+        }
+
+        /* Container & Scrolling */
+        .deck-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .deck-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Chrome */
+
+        /* Base Slide Template */
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: center;
+            padding: 4rem;
+            position: relative;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 4rem;
+            width: 100%;
+            max-width: 1200px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative top accent line */
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active .glass-panel::before {
+            opacity: 1;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .title-main {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-header {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 2.5rem;
+            display: inline-block;
+            position: relative;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            transition: width 0.8s ease;
+        }
+
+        .slide.active .section-header::after {
+            width: 100%;
+        }
+
+        p,
+        li {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        /* Layout Grids */
+        .split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        /* Imagery */
+        .hero-img {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            filter: grayscale(20%) contrast(1.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.5s, filter 0.5s;
+        }
+
+        .hero-img:hover {
+            transform: scale(1.02);
+            filter: grayscale(0%) contrast(1.1);
+            box-shadow: 0 0 30px var(--glow-alt);
+        }
+
+        /* Advanced UI Components */
+        .info-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 16px;
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-card:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .bad-card {
+            border-left: 4px solid #ef4444;
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+        }
+
+        .good-card {
+            border-left: 4px solid var(--primary);
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
+        }
+
+        /* Flow Chart CSS */
+        .flow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            border: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+
+        .flow-node {
+            background: var(--surface-hover);
+            border: 1px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .flow-node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--glow);
+            z-index: 10;
+        }
+
+        .flow-node strong {
+            display: block;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .flow-node small {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .flow-node.active {
+            border-color: var(--secondary);
+            background: rgba(14, 165, 233, 0.2);
+            box-shadow: 0 0 30px var(--glow-alt);
+        }
+
+        .detail-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            min-height: 180px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            text-align: left;
+        }
+
+        .detail-panel.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .detail-panel h3 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-specs {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .spec-tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
+            color: var(--primary);
+        }
+
+        .arrow-icon {
+            color: var(--secondary);
+            font-size: 2rem;
+            animation: bounceRight 2s infinite;
+        }
+
+        @keyframes bounceRight {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(10px);
+            }
+        }
+
+        /* Navigation */
+        .nav-sidebar {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            z-index: 50;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border);
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .nav-dot::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%) translateX(10px);
+            background: var(--surface);
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            white-space: nowrap;
+            border: 1px solid var(--border);
+        }
+
+        .nav-dot:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .nav-dot.active {
+            background: var(--primary);
+            transform: scale(1.5);
+            box-shadow: 0 0 15px var(--glow);
+        }
+
+        /* Cinematic Animation Engine */
+        .fx-fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fx-fade-right {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fx-fade-left {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fx-zoom {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide.active .fx-fade-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide.active .fx-fade-right {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.active .fx-fade-left {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.active .fx-zoom {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .d-1 {
+            transition-delay: 0.1s;
+        }
+
+        .d-2 {
+            transition-delay: 0.2s;
+        }
+
+        .d-3 {
+            transition-delay: 0.3s;
+        }
+
+        .d-4 {
+            transition-delay: 0.4s;
+        }
+
+        /* Custom List Styles */
+        .check-list {
+            list-style: none;
+        }
+
+        .check-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .check-list li::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- AI Particle Background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="ambient ambient-1"></div>
+    <div class="ambient ambient-2"></div>
+
+    <!-- Navigation -->
+    <div class="nav-sidebar">
+        <a href="#s1" class="nav-dot active" data-label="Title"></a>
+        <a href="#s2" class="nav-dot" data-label="Introduction"></a>
+        <a href="#s3" class="nav-dot" data-label="Abstract"></a>
+        <a href="#s4" class="nav-dot" data-label="Existing System"></a>
+        <a href="#s5" class="nav-dot" data-label="Proposed System"></a>
+        <a href="#s6" class="nav-dot" data-label="Architecture"></a>
+        <a href="#s7" class="nav-dot" data-label="Dataset"></a>
+        <a href="#s8" class="nav-dot" data-label="Advanced Logic"></a>
+        <a href="#s9" class="nav-dot" data-label="Performance"></a>
+        <a href="#s10" class="nav-dot" data-label="Literature"></a>
+        <a href="#s11" class="nav-dot" data-label="Conclusion"></a>
+    </div>
+
+    <!-- Slide Deck -->
+    <div class="deck-container" id="deck">
+
+        <!-- SLIDE 1: TITLE -->
+        <section id="s1" class="slide">
+            <div class="glass-panel"
+                style="text-align: center; border: none; background: transparent; box-shadow: none;">
+                <div class="fx-fade-up">
+                    <span
+                        style="font-family: 'Outfit'; letter-spacing: 4px; color: var(--primary); font-weight: 600; text-transform: uppercase;">Final
+                        Project Review</span>
+                </div>
+                <h1 class="title-main fx-zoom d-1 mt-4">Sudharsan AI Vision<br>Emotion Engine</h1>
+                <h2 class="gradient-text fx-fade-up d-2" style="font-size: 2rem; margin-top: 1rem;">using Deep Learning
+                    with DCNN-BiLSTM & Dual Attention</h2>
+
+                <div class="fx-fade-up d-3"
+                    style="margin-top: 4rem; display: flex; gap: 1.5rem; justify-content: center;">
+                    <button onclick="document.getElementById('s2').scrollIntoView({behavior: 'smooth'})"
+                        style="background: var(--surface); border: 1px solid var(--border); color: white; padding: 1rem 2.5rem; border-radius: 50px; font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(10px); transition: 0.3s;"
+                        onmouseover="this.style.background='var(--surface-hover)'; this.style.borderColor='var(--primary)';"
+                        onmouseout="this.style.background='var(--surface)'; this.style.borderColor='var(--border)';">
+                        Start Presentation ↓
+                    </button>
+                    <a href="/dashboard.html"
+                        style="text-decoration: none; background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; color: black; font-weight: 800; padding: 1rem 2.5rem; border-radius: 50px; font-size: 1.2rem; cursor: pointer; transition: 0.3s; display: inline-block;"
+                        onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 30px var(--glow)';"
+                        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                        Launch AI Dashboard ➜
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: INTRO -->
+        <section id="s2" class="slide">
+            <div class="glass-panel split-grid">
+                <div class="fx-fade-right">
+                    <h2 class="section-header">1. Introduction</h2>
+                    <p>Facial Expression Recognition (FER) is a highly complex branch of Artificial Intelligence
+                        bridging the gap in Human-Computer Interaction (HCI).</p>
+                    <ul class="check-list">
+                        <li><strong style="color: white;">The Goal:</strong> Enable machines to flawlessly read emotion
+                            for deployment in mental health, security, and UI UX.</li>
+                        <li><strong style="color: white;">The Bottleneck:</strong> Traditional models fail dramatically
+                            when lighting changes or a face turns sideways.</li>
+                        <li><strong style="color: white;">The Innovation:</strong> Moving away from "static snapshots"
+                            to analyzing the <span class="gradient-text" style="font-weight:bold;">temporal flow of
+                                muscle movement</span>.</li>
+                    </ul>
+                </div>
+                <div class="fx-fade-left d-2">
+                    <img src="assets/intro_hero.png" class="hero-img" alt="AI Scan">
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: ABSTRACT -->
+        <section id="s3" class="slide">
+            <div class="glass-panel split-grid" style="grid-template-columns: 0.8fr 1.2fr;">
+                <div class="fx-fade-right d-1">
+                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
+                        class="hero-img" alt="Cyber Grid">
+                </div>
+                <div class="fx-fade-left">
+                    <h2 class="section-header">2. Abstract</h2>
+                    <p>We propose a completely bespoke, highly-compliant neural architecture designed to eradicate the
+                        limitations of standard Convolutional Neural Networks.</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+                        <div class="info-card">
+                            <h3 class="gradient-text">Geometry Extraction</h3>
+                            <p style="font-size: 1rem;">HOG algorithms strip out confusing colors/shadows to preserve
+                                pure muscle shapes.</p>
+                        </div>
+                        <div class="info-card">
+                            <h3 class="gradient-text">Spatial Matrix</h3>
+                            <p style="font-size: 1rem;">A precise 3-layer Convolution evaluates pixel-depth
+                                relationships perfectly.</p>
+                        </div>
+                        <div class="info-card">
+                            <h3 class="gradient-text">Bi-Directional Memory</h3>
+                            <p style="font-size: 1rem;">LSTMs read facial changes forward and backward in sequence.</p>
+                        </div>
+                        <div class="info-card">
+                            <h3 class="gradient-text">Dual Attention</h3>
+                            <p style="font-size: 1rem;">Forces the AI to ignore the background and obsess strictly over
+                                the eyes and mouth.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: EXISTING -->
+        <section id="s4" class="slide">
+            <div class="glass-panel">
+                <center class="fx-fade-up">
+                    <h2 class="section-header">3. Existing System Architecture</h2>
+                </center>
+
+                <div class="split-grid" style="margin-top: 2rem;">
+                    <div class="fx-fade-right d-1">
+                        <h3 style="font-size: 2rem; margin-bottom: 1rem;">How Others Do It</h3>
+                        <p>Most university and enterprise baseline systems deploy standard CNN topologies heavily
+                            reliant on simple Softmax categorizations.</p>
+                        <p>They take a single frame, flatten it, and guess the emotion without context.</p>
+                    </div>
+                    <div class="info-card bad-card fx-fade-left d-2">
+                        <h3 style="color: #ef4444; margin-bottom: 1rem; font-size: 1.5rem;">Critical Disadvantages</h3>
+                        <ul class="check-list">
+                            <li><strong>Context Blindness:</strong> A static model cannot differentiate between a smirk
+                                forming and a natural resting face.</li>
+                            <li><strong>Background Overfitting:</strong> Without Attention layers, the model
+                                accidentally memorizes the background wallpaper instead of the human.</li>
+                            <li><strong>Dataset Brittleness:</strong> Drastic drops in accuracy when lighting changes.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: PROPOSED -->
+        <section id="s5" class="slide">
+            <div class="glass-panel">
+                <center class="fx-fade-up">
+                    <h2 class="section-header">4. Proposed System Evolution</h2>
+                </center>
+
+                <div class="split-grid" style="margin-top: 2rem;">
+                    <div class="info-card good-card fx-fade-right d-1">
+                        <h3 style="color: var(--primary); margin-bottom: 1rem; font-size: 1.5rem;">Unprecedented
+                            Advantages</h3>
+                        <ul class="check-list">
+                            <li><strong>Temporal Flow Tracking:</strong> BiLSTM provides "memory", allowing the AI to
+                                gauge an emotion's buildup.</li>
+                            <li><strong>Surgical Focus:</strong> Dual Attention acts like a magnifying glass exclusively
+                                on dominant facial features.</li>
+                            <li><strong>Geometry Over Color:</strong> HOG extracts structural slopes, making the system
+                                practically immune to harsh shadows.</li>
+                        </ul>
+                    </div>
+                    <div class="fx-fade-left d-2">
+                        <h3 style="font-size: 2rem; margin-bottom: 1rem;">Our Mathematical Approach</h3>
+                        <p>By shifting the focus from raw pixels to mapped geometric sequences with intelligent regional
+                            bias, the system achieves robust emotion classification capable of handling real-world
+                            chaos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: MODULES -->
+        <section id="s6" class="slide">
+            <div class="glass-panel">
+                <h2 class="section-header fx-fade-right">5. Application Modules</h2>
+
+                <div class="flow-container fx-zoom d-1">
+                    <div class="flow-node" onclick="showDetail('input', this)"><strong>HOG
+                            Extractor</strong><small>64x64 Gradients</small></div>
+                    <div class="arrow-icon">➔</div>
+                    <div class="flow-node" onclick="showDetail('dcnn', this)"><strong>Deep CNN</strong><small>3 Conv + 2
+                            Pool</small></div>
+                    <div class="arrow-icon">➔</div>
+                    <div class="flow-node" style="border-color: var(--secondary);" onclick="showDetail('dam', this)">
+                        <strong>Attention</strong><small>Spatial & Channel</small>
+                    </div>
+                    <div class="arrow-icon">➔</div>
+                    <div class="flow-node" onclick="showDetail('bilstm', this)"><strong>Bi-LSTM</strong><small>Sequence
+                            Memory</small></div>
+                    <div class="arrow-icon">➔</div>
+                    <div class="flow-node" style="background: rgba(16, 185, 129, 0.2);"
+                        onclick="showDetail('output', this)">
+                        <strong>Softmax</strong><small>Output Tensor</small>
+                    </div>
+                </div>
+
+                <div id="arch-detail" class="detail-panel fx-fade-up d-2">
+                    <h3 id="panel-title">Interactive Module Explorer</h3>
+                    <p id="panel-desc">Click any stage of the neural pipeline above to see the technical deep-dive and
+                        implementation logic.</p>
+                    <div id="panel-specs" class="tech-specs"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: DATASET -->
+        <section id="s7" class="slide">
+            <div class="glass-panel split-grid">
+                <div class="fx-fade-right">
+                    <h2 class="section-header">6. Dataset & Training</h2>
+                    <p>The model was trained on the legendary <strong>FER-2013</strong> dataset using state-of-the-art
+                        optimization techniques.</p>
+                    <div class="info-card">
+                        <ul class="check-list" style="margin:0;">
+                            <li><strong>Scale:</strong> 35,887 Grayscale images categorized into 7 classes.</li>
+                            <li><strong>Optimization:</strong> AdamW Optimizer with Cosine Annealing scheduler.</li>
+                            <li><strong>Environment:</strong> Trained locally using **Metal Performance Shaders (MPS)**
+                                for local acceleration.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="fx-fade-left d-2">
+                    <img src="assets/dataset_visual.png" class="hero-img" alt="Data Analytics">
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: ADVANCED LOGIC -->
+        <section id="s8" class="slide">
+            <div class="glass-panel">
+                <h2 class="section-header fx-fade-right">7. The Intelligence Core</h2>
+                <p class="fx-fade-up d-1">While standard models give up when a face is partially hidden, our system uses
+                    advanced mathematical fallbacks.</p>
+
+                <div class="comparison-grid fx-zoom d-2">
+                    <div class="info-card good-card">
+                        <h3 style="color: var(--primary);">Dual Attention (DAM)</h3>
+                        <p style="font-size: 1rem;">Calculates both Spatial (Where) and Channel (What) attention
+                            weightings to isolate eyes and mouth from noisy backgrounds.</p>
+                    </div>
+                    <div class="info-card good-card">
+                        <h3 style="color: var(--secondary);">YOLO Transition Fallback</h3>
+                        <p style="font-size: 1rem;">If face-structure is lost, YOLOv8 bounding boxes provide
+                            person-level geometry, maintaining inference without total signal loss.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: RESULTS -->
+        <section id="s9" class="slide">
+            <div class="glass-panel" style="text-align: center;">
+                <h2 class="section-header fx-fade-up">8. Performance Metrics</h2>
+                <div class="split-grid" style="margin-top: 3rem;">
+                    <div class="fx-fade-right d-1">
+                        <div class="info-card"
+                            style="border-color: var(--primary); background: rgba(16, 185, 129, 0.1);">
+                            <h1 style="color: var(--primary); font-size: 4.5rem; margin:0;">50.7%</h1>
+                            <p style="color: white; font-weight: bold; margin:0;">Validation Accuracy</p>
+                            <small>on the Raw FER-2013 Dataset</small>
+                        </div>
+                    </div>
+                    <div class="fx-fade-left d-2">
+                        <div class="info-card"
+                            style="border-color: var(--secondary); background: rgba(14, 165, 233, 0.1);">
+                            <h1 style="color: var(--secondary); font-size: 4.5rem; margin:0;">
+                                < 100ms</h1>
+                                    <p style="color: white; font-weight: bold; margin:0;">End-to-End Latency</p>
+                                    <small>including Preprocessing & UI Rendering</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: LITERATURE -->
+        <section id="s10" class="slide">
+            <div class="glass-panel split-grid">
+                <div class="fx-fade-right">
+                    <h2 class="section-header">9. Literature Review</h2>
+                    <p>Our hybrid methodology resolves documented flaws across multiple seminal research papers:</p>
+                    <ul class="check-list" style="margin-top: 2rem; font-size:1.1rem;">
+                        <li><strong>Standard Vision (Goodfellow):</strong> Exceptional at spatial recognition but lack
+                            sequence memory for ambiguous traits.</li>
+                        <li><strong>Temporal Models (Donahue):</strong> Proved that combining memory with visual arrays
+                            increases activity recognition dramatically.</li>
+                        <li><strong>Attention (Woo et al., CBAM):</strong> Demonstrated that dividing focus across
+                            'where to look' and 'what to look at' is superior.</li>
+                    </ul>
+                </div>
+                <div class="fx-fade-left d-2">
+                    <img src="assets/literature_visual.png" class="hero-img" alt="Hacker Code Base">
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: CONCLUSION -->
+        <section id="s11" class="slide">
+            <div class="glass-panel"
+                style="text-align: center; border: 1px solid var(--primary); background: rgba(15, 23, 42, 0.8);">
+                <div class="fx-zoom">
+                    <h2 class="section-header" style="margin-bottom: 1rem; border:none; background:transparent;">10.
+                        Conclusion</h2>
+
+                    <p style="font-size: 1.5rem; max-width: 800px; margin: 2rem auto; color: white;">
+                        The <strong>DCNN-BiLSTM-DAM</strong> framework successfully resolves the computational
+                        bottlenecks holding back dynamic human expression tracking.
+                    </p>
+
+                    <h1 class="gradient-text" style="font-size: 5rem; margin-top: 4rem; text-transform: uppercase;">
+                        Thank You</h1>
+                    <p style="color: var(--secondary); font-size: 1.5rem; letter-spacing: 2px;">Any Questions?</p>
+                </div>
+            </div>
+        </section>
+
+
+    </div>
+
+    <!-- JS ENGINE -->
+    <script>
+        // --- 1. Scroll Spy & Animation Triggering ---
+        const deck = document.getElementById('deck');
+        const slides = document.querySelectorAll('.slide');
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        const observerOptions = {
+            root: deck,
+            threshold: 0.5
+        };
+
+        const slideObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Activate animations on slide
+                    entry.target.classList.add('active');
+
+                    // Update Nav Dots
+                    const id = entry.target.id;
+                    navDots.forEach(dot => {
+                        dot.classList.remove('active');
+                        if (dot.getAttribute('href') === '#' + id) {
+                            dot.classList.add('active');
+                        }
+                    });
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, observerOptions);
+
+        slides.forEach(slide => slideObserver.observe(slide));
+
+        // Smooth Scroll for Nav Dots
+        navDots.forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // --- 2. Advanced Particle Background ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray;
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) { this.directionX = -this.directionX; }
+                if (this.y > canvas.height || this.y < 0) { this.directionY = -this.directionY; }
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 15000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 0.4) - 0.2;
+                let directionY = (Math.random() * 0.4) - 0.2;
+                let color = 'rgba(16, 185, 129, 0.4)'; // Emerald tint
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                // Connect particles
+                for (let j = i; j < particlesArray.length; j++) {
+                    let dx = particlesArray[i].x - particlesArray[j].x;
+                    let dy = particlesArray[i].y - particlesArray[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 120) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(14, 165, 233, ${0.2 - distance / 600})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            initParticles();
+        });
+
+        initParticles();
+        animateParticles();
+
+        // Interactive Architecture Logic
+        const archData = {
+            input: {
+                title: "Live Media Ingestion",
+                desc: "Captures high-frequency frames and applies YOLOv8 to locate human subjects. It uses an intelligent fallback to ensure tracking even in low-visibility environments.",
+                specs: ["OpenCV Feed", "YOLOv8 tracking", "Haar Cascades"]
+            },
+            preprocess: {
+                title: "HOG Geometry Extraction",
+                desc: "Converts images to Grayscale and extracts HOG gradients. This strips out misleading lighting data, preserving only the geometric contours of facial muscles.",
+                specs: ["64x64 Matrix", "8 Orientations", "Normalization"]
+            },
+            dcnn: {
+                title: "Deep Convolutional Neural Network",
+                desc: "A custom 3-layer DCNN architecture designed for intensive spatial feature extraction. It identifies micro-patterns in facial geometry using 5x5 kernels.",
+                specs: ["3 Conv Layers", "2 MaxPool", "ReLU"]
+            },
+            dam: {
+                title: "Dual Attention Mechanism (DAM)",
+                desc: "Applies Spatial and Channel attention in parallel. It serves as an 'AI Magnifying Glass', forcing the network to prioritize the mouth and eyes.",
+                specs: ["Spatial Attention", "Channel MLP", "Cross-Fusion"]
+            },
+            bilstm: {
+                title: "Bidirectional LSTM",
+                desc: "Processes spatial embeddings in both forward and backward directions to understand the temporal flow of facial expressions.",
+                specs: ["Parallel Processing", "Sequence Memory", "Temporal Context"]
+            },
+            output: {
+                title: "Softmax Classification",
+                desc: "Converts sequential embeddings into a probability distribution across 7 emotions to determine real-time feedback.",
+                specs: ["7 Classes", "FC Dense Layer", "Softmax"]
+            }
+        };
+
+        function showDetail(key, el) {
+            const panel = document.getElementById('arch-detail');
+            const nodes = document.querySelectorAll('.flow-node');
+
+            nodes.forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+
+            panel.style.opacity = '0';
+            panel.style.transform = 'translateY(10px)';
+
+            setTimeout(() => {
+                document.getElementById('panel-title').innerText = archData[key]?.title || archData['input'].title;
+                document.getElementById('panel-desc').innerText = archData[key]?.desc || archData['input'].desc;
+
+                const specsDiv = document.getElementById('panel-specs');
+                specsDiv.innerHTML = '';
+                (archData[key]?.specs || []).forEach(s => {
+                    const span = document.createElement('span');
+                    span.className = 'spec-tag';
+                    span.innerText = s;
+                    specsDiv.appendChild(span);
+                });
+
+                panel.classList.add('show');
+                panel.style.opacity = '1';
+                panel.style.transform = 'translateY(0)';
+            }, 300);
+        }
+    </script>
+</body>
+
+</html>

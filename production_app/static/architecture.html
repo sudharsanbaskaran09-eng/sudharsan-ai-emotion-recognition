@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Architecture | DCNN-BiLSTM-DAM</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --primary: #10b981;
+            --secondary: #0ea5e9;
+            --text: #f8fafc;
+            --glass: rgba(15, 23, 42, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Architecture Map */
+        .arch-map {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 2rem;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .node {
+            background: #1e293b;
+            border: 2px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 160px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .node:hover {
+            transform: scale(1.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .node.active {
+            border-color: var(--secondary);
+            background: rgba(14, 165, 233, 0.1);
+            box-shadow: 0 0 40px rgba(14, 165, 233, 0.4);
+        }
+
+        .node strong {
+            display: block;
+            font-family: 'Outfit', sans-serif;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .node small {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .arrow {
+            flex-grow: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .arrow::after {
+            content: '➤';
+            position: absolute;
+            right: -5px;
+            top: -12px;
+            color: var(--secondary);
+        }
+
+        /* Detail Modal */
+        .detail-panel {
+            margin-top: 3rem;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            min-height: 200px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .detail-panel.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .detail-panel h3 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--secondary);
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .detail-panel p {
+            line-height: 1.8;
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+
+        .tech-specs {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .spec-tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>System Logic Flow</h1>
+
+        <div class="arch-map">
+            <div class="node" onclick="showDetail('input')">
+                <strong>Input Feed</strong>
+                <small>Media Pipeline</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node" onclick="showDetail('preprocess')">
+                <strong>HOG Processing</strong>
+                <small>Spatial Gradient</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node" onclick="showDetail('dcnn')">
+                <strong>DCNN</strong>
+                <small>Feature Extraction</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node" onclick="showDetail('dam')">
+                <strong>Dual Attention</strong>
+                <small>Regional Focus</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node" onclick="showDetail('bilstm')">
+                <strong>Bi-LSTM</strong>
+                <small>Temporal Flow</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node" onclick="showDetail('output')">
+                <strong>Classifier</strong>
+                <small>Softmax Tensor</small>
+            </div>
+        </div>
+
+        <div id="panel" class="detail-panel">
+            <h3 id="panel-title">Click a module to investigate</h3>
+            <p id="panel-desc">Select any stage of the neural pipeline to see the technical deep-dive and implementation
+                logic.</p>
+            <div id="panel-specs" class="tech-specs"></div>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            input: {
+                title: "Live Media Ingestion",
+                desc: "The system captures high-frequency frames from a connected webcam or processes uploaded static images. It utilizes YOLOv8 to locate human subjects and applies an intelligent fallback to ensure tracking even in low-visibility environments.",
+                specs: ["OpenCV Feed", "YOLOv8 tracking", "Haar Cascades"]
+            },
+            preprocess: {
+                title: "HOG Geometry Extraction",
+                desc: "Before entering the model, images are converted to Grayscale and processed via Histogram of Oriented Gradients (HOG). This strips out misleading lighting and color data, preserving only the geometric contours of facial muscles.",
+                specs: ["64x64 Matrix", "8 Orientations", "Non-linear normalization"]
+            },
+            dcnn: {
+                title: "Deep Convolutional Neural Network",
+                desc: "A custom 3-layer DCNN architecture designed for intensive spatial feature extraction. It uses kernel weights to identify micro-patterns in facial geometry, reducing dimensionality through MaxPool layers for efficient processing.",
+                specs: ["3 Conv Layers", "2 MaxPool", "ReLU Activation"]
+            },
+            dam: {
+                title: "Dual Attention Mechanism (DAM)",
+                desc: "This stage applies both Spatial and Channel attention in parallel. It serves as an 'AI Magnifying Glass', mathematically forcing the network to ignore background noise and prioritize the mouth and eyes.",
+                specs: ["Spatial Attention", "Channel MLP", "Cross-Fusion"]
+            },
+            bilstm: {
+                title: "Bidirectional LSTM",
+                desc: "The extracted spatial features are flattened into a sequence. The Bi-LSTM then processes this sequence in both forward and backward directions to understand the temporal flow of the facial expression.",
+                specs: ["Parallel Processing", "Sequence Memory", "Temporal Context"]
+            },
+            output: {
+                title: "Softmax Classification",
+                desc: "The final layer converts the sequential embeddings into a probability distribution across 7 emotions. The highest confidence percentage determines the real-time feedback displayed on the dashboard.",
+                specs: ["7 Emotion Classes", "FC Dense Layer", "Softmax Activation"]
+            }
+        };
+
+        function showDetail(key) {
+            const panel = document.getElementById('panel');
+            const nodes = document.querySelectorAll('.node');
+
+            // UI Feedback
+            nodes.forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            panel.classList.remove('show');
+
+            setTimeout(() => {
+                document.getElementById('panel-title').innerText = data[key].title;
+                document.getElementById('panel-desc').innerText = data[key].desc;
+
+                const specsDiv = document.getElementById('panel-specs');
+                specsDiv.innerHTML = '';
+                data[key].specs.forEach(s => {
+                    const span = document.createElement('span');
+                    span.className = 'spec-tag';
+                    span.innerText = s;
+                    specsDiv.appendChild(span);
+                });
+
+                panel.classList.add('show');
+            }, 300);
+        }
+    </script>
+</body>
+
+</html>

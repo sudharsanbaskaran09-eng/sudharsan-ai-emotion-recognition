@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+opencv-python
+torch
+torchvision
+numpy
+pillow
+scikit-image
+ultralytics
+transformers
+kagglehub
+requests

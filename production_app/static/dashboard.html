@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expression Analyzer AI Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Ambient Background -->
+    <div class="ambient-light blob-1"></div>
+    <div class="ambient-light blob-2"></div>
+
+    <div class="dashboard-wrapper">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="logo-area">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="brand-icon">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div class="title-group">
+    <h1>Sudharsan <span class="highlight">Emotion Engine</span></h1>
+    <p>Advanced Deep Learning Architecture</p>
+</div>
+            </div>
+            <div class="controls-header" style="display: flex; gap: 1rem; align-items: center;">
+                <a href="/"
+                    style="text-decoration: none; color: var(--text-muted); font-size: 0.9rem; border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 8px; transition: 0.3s;"
+                    onmouseover="this.style.borderColor='var(--primary)'; this.style.color='white';"
+                    onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)';">
+                    ← Back to Presentation
+                </a>
+                <div class="mode-toggle">
+                    <button class="toggle-btn active" id="btn-webcam">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M23 7l-7 5 7 5V7z"></path>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                        Live Camera
+                    </button>
+                    <button class="toggle-btn" id="btn-upload">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Upload media
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="dashboard-grid">
+
+            <!-- Left Column: Video/Image Feed -->
+            <section class="glass-panel media-section">
+
+                <!-- WebCam View -->
+                <div id="webcam-container" class="media-container view-active">
+                    <video id="webcam-video" autoplay playsinline muted></video>
+                    <canvas id="webcam-canvas" class="bounding-boxes-overlay"></canvas>
+
+                    <div class="overlay-controls">
+                        <button class="action-btn start-pulse" id="start-webcam-btn">Initialize Tracking</button>
+                        <button class="action-btn stop-btn hidden" id="stop-webcam-btn">Halt Stream</button>
+                    </div>
+                </div>
+
+                <!-- Upload View -->
+                <div id="upload-container" class="media-container hidden">
+                    <div class="drop-zone" id="drop-zone">
+                        <input type="file" id="file-input" accept="image/*" hidden>
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Drag & drop analysis target</h3>
+                        <p>Supports PNG, JPG up to 10MB</p>
+                        <button class="action-btn" id="browse-btn" style="margin-top:1rem;">Select File</button>
+                    </div>
+
+                    <div class="preview-area hidden" id="preview-area">
+                        <img id="image-preview" src="" alt="Target feed">
+                        <canvas id="upload-canvas" class="bounding-boxes-overlay"></canvas>
+                        <div class="overlay-controls bottom-bar">
+                            <button class="action-btn ghost" id="reset-btn">Reset</button>
+                            <button class="action-btn primary" id="analyze-btn">Execute Analysis</button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Right Column: Analytics & Metrics -->
+            <section class="glass-panel analytics-section">
+                <div class="panel-header">
+                    <h2>Live Telemetry</h2>
+                    <span class="status-indicator">
+                        <span class="pulse-dot"></span> <span id="system-status">Awaiting Input</span>
+                    </span>
+                </div>
+
+                <!-- Crowd Statistics (YOLO) -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-value" id="count-people">0</span>
+                        <span class="stat-label">Subjects Detected</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="count-animals">0</span>
+                        <span class="stat-label">Animals Present</span>
+                    </div>
+                    <div class="stat-card network-card">
+                        <span class="stat-value" id="latency-val">--<span
+                                style="font-size:12px;color:var(--text-muted)">ms</span></span>
+                        <span class="stat-label">Inference Latency</span>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Primary Subject Analytics -->
+                <div class="primary-subject">
+                    <h3 class="section-title">Primary Subject Assessment</h3>
+                    <div class="subject-readout">
+                        <div class="emotion-display">
+                            <h2 id="emotion-label">N/A</h2>
+                            <p class="confidence-text" id="confidence-label">Confidence: ---%</p>
+                        </div>
+                        <div class="demographic-display">
+                            <span class="demo-badge">ViT Age Estimator</span>
+                            <h3 id="age-label">--</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Emotion Spectrum -->
+                <div class="emotion-spectrum">
+                    <h3 class="section-title">Psychological Spectrum</h3>
+                    <ul class="emotion-bars" id="emotion-bars">
+                        <!-- Default Empty State -->
+                        <li style="text-align:center; color: var(--text-muted); padding: 1rem 0;">Awaiting neuro-visual
+                            data...</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
